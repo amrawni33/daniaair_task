@@ -2,31 +2,20 @@
 
 namespace App\Exceptions;
 
+use BadMethodCallException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\QueryException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of exception types with their corresponding custom log levels.
-     *
-     * @var array<class-string<\Throwable>, \Psr\Log\LogLevel::*>
-     */
-    protected $levels = [
-        //
-    ];
-
-    /**
-     * A list of the exception types that are not reported.
-     *
-     * @var array<int, class-string<\Throwable>>
-     */
-    protected $dontReport = [
-        //
-    ];
-
-    /**
-     * A list of the inputs that are never flashed to the session on validation exceptions.
+     * The list of the inputs that are never flashed to the session on validation exceptions.
      *
      * @var array<int, string>
      */
@@ -44,5 +33,57 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+
+        $this->renderable(function (ValidationException $e, $request) {
+            $statusCode = gettype($e->getCode()) == 'integer' && strlen((string) $e->getCode()) == 3?$e->getCode():500;
+
+            if ($request->wantsJson()) {
+                return response()->api([], 1, $e->getMessage(), statusCode:$statusCode);
+            }
+        });
+
+        $this->renderable(function (QueryException $e, $request) {
+            $statusCode = gettype($e->getCode()) == 'integer' && strlen((string) $e->getCode()) == 3?$e->getCode():500;
+
+            if ($request->wantsJson()) {
+                return response()->api([], 1, $e->getMessage(), statusCode:$statusCode);
+            }
+        });
+
+        $this->renderable(function (AccessDeniedHttpException $e, $request) {
+            $statusCode = gettype($e->getCode()) == 'integer' && strlen((string) $e->getCode()) == 3?$e->getCode():403;
+            if ($request->wantsJson()) {
+                return response()->api([], 1, $e->getMessage(), statusCode:$statusCode);
+            }
+        });
+
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+            $statusCode = gettype($e->getCode()) == 'integer' && strlen((string) $e->getCode()) == 3?$e->getCode():404;
+            if ($request->wantsJson()) {
+                return response()->api([], 1, $e->getMessage(), statusCode:$statusCode);
+            }
+        });
+
+        $this->renderable(function (BadMethodCallException $e, $request) {
+            $statusCode = gettype($e->getCode()) == 'integer' && strlen((string) $e->getCode()) == 3?$e->getCode():404;
+            if ($request->wantsJson()) {
+                return response()->api([], 1, $e->getMessage(), statusCode:$statusCode);
+            }
+        });
+
+        $this->renderable(function (AuthorizationException $e, $request) {
+            $statusCode = gettype($e->getCode()) == 'integer' && strlen((string) $e->getCode()) == 3?$e->getCode():404;
+            if ($request->wantsJson()) {
+                return response()->api([], 1, $e->getMessage(), statusCode:$statusCode);
+            }
+        });
+
+        $this->renderable(function (AuthenticationException $e, $request) {
+            $statusCode = gettype($e->getCode()) == 'integer' && strlen((string) $e->getCode()) == 3?$e->getCode():404;
+            if ($request->wantsJson()) {
+                return response()->api([], 1, $e->getMessage(), statusCode:$statusCode);
+            }
+        });
+
     }
 }
