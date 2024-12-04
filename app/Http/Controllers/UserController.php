@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
@@ -8,7 +8,6 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
@@ -50,6 +49,7 @@ class UserController extends Controller
         $validatedData['password'] = Hash::make($validatedData['password']);
         $user = User::create($validatedData);
 
+        $user->assignRole($request->role);
         $data = [
             'user' => new UserResource($user),
             'token' => $user->createToken('my-app-token')->plainTextToken,
