@@ -32,7 +32,7 @@ class TaskService
         $choeasedUser = $users->first();
         $task->assigned_user = $users->first()->id;
         $task->save();
-        // $message = "A new task titled '{$task->title}' has been assigned to you.";
-        // $choeasedUser->notify(new TaskNotification($task, $message));
+        $message = "A new task titled '{$task->title}' has been assigned to you.";
+        $choeasedUser->notify(new TaskNotification($task, $message));
     }
 }

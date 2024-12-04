@@ -7,7 +7,10 @@ use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskCollection;
 use App\Http\Resources\TaskResource;
+use App\Models\User;
+use App\Notifications\TaskNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -77,6 +80,9 @@ class TaskController extends Controller
             ], 500);
         }
         $task->assigned_user = $request->user_id;
+        $message = "A new task titled '{$task->title}' has been assigned to you.";
+        $user = User::where('id', $request->user_id);
+        $user->notify(new TaskNotification($task, $message));
         $task->save();
     }
 
@@ -93,6 +99,9 @@ class TaskController extends Controller
             ], 500);
         }
         $task->status = $request->status;
+        $message = "Task titled '{$task->title}' has been updated.";
+        $user = User::where('id', $task->assigned_user);
+        $user->notify(new TaskNotification($task, $message));
         $task->save();
     }
 }

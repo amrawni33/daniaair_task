@@ -41,7 +41,8 @@ class PermissionsSeeder extends Seeder
             'create tasks',
             'edit tasks',
             'assign tasks',
-            'task auto assign by round-robin'
+            'task auto assign by round-robin',
+            'view tasks efficiency'
 
         ];
         $managerRole->syncPermissions($managerPermissions);

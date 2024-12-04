@@ -20,23 +20,23 @@ use App\Http\Controllers\TaskController;
 
 
 Route::post('/auth/login', [UserController::class, 'login']);
-Route::post('/auth/register', [UserController::class, 'register'])->middleware('permission:edit users');;
 
 Route::middleware(['auth:sanctum'])->group(function () {
-
+    Route::post('/auth/register', [UserController::class, 'register'])->middleware('role:Admin');
+    
     Route::prefix('tasks')->group(function () {
-        Route::get('/', [TaskController::class, 'index'])->middleware('permission:view tasks');;
-        Route::post('/', [TaskController::class, 'store'])->middleware('permission:create tasks');;
-        Route::put('/{task}', [TaskController::class, 'update'])->middleware('permission:edit tasks');;
-        Route::delete('/{task}', [TaskController::class, 'destroy'])->middleware('permission:delete tasks');;
+        Route::get('/', [TaskController::class, 'index'])->middleware('permission:view tasks');
+        Route::post('/', [TaskController::class, 'store'])->middleware('permission:create tasks');
+        Route::put('/{task}', [TaskController::class, 'update'])->middleware('permission:edit tasks');
+        Route::delete('/{task}', [TaskController::class, 'destroy'])->middleware('permission:delete tasks');
     });
 
-    Route::put('task/assign-to-user/{task}', [TaskController::class, 'assignTaskToUser'])->middleware('permission:assign tasks');;
-    Route::put('task/update-task-status/{task}', [TaskController::class, 'updateTaskStatus'])->middleware('permission:update task status');;
+    Route::put('task/assign-to-user/{task}', [TaskController::class, 'assignTaskToUser'])->middleware('permission:assign tasks');
+    Route::put('task/update-task-status/{task}', [TaskController::class, 'updateTaskStatus'])->middleware('permission:update task status');
 
+    Route::get('tasks-efficiency', [ManagerController::class, 'taskEfficiency'])->middleware('permission:view tasks efficiency');
+    Route::get('apply-round-robin', [ManagerController::class, 'assignTasksRoundRobin'])->middleware('permission:task auto assign by round-robin');
 
-    Route::get('tasks-efficiency', [ManagerController::class, 'taskEfficiency'])->middleware('permission:view tasks efficiency');;
-    Route::get('apply-round-robin', [ManagerController::class, 'assignTasksRoundRobin'])->middleware('permission:task auto assign by round-robin');;
-
-    Route::get('admin-dashboard', [AdminController::class, 'index'])->middleware('role:Admin');;
+    Route::get('admin-dashboard', [AdminController::class, 'index'])->middleware('role:Admin');
 });
+
